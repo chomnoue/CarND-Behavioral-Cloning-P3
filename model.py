@@ -38,7 +38,6 @@ if __name__ == "__main__":
         reader = csv.reader(csvfile)
         for line in reader:
             samples.append(line)
-    print(samples[5])
 
     train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
@@ -76,6 +75,6 @@ if __name__ == "__main__":
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    model.save_weights(save_dir+"/model.h5", True)
+    model.save(save_dir+"/model.h5", True)
     with open(save_dir+'/model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
