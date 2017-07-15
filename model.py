@@ -1,16 +1,3 @@
-import os
-import csv
-
-samples = []
-with open('data/driving_log.csv') as csvfile:
-    reader = csv.reader(csvfile)
-    for line in reader:
-        samples.append(line)
-
-from sklearn.model_selection import train_test_split
-from sklearn.utils import shuffle
-train_samples, validation_samples = train_test_split(samples, test_size=0.2)
-
 import cv2
 import numpy as np
 import sklearn
@@ -18,7 +5,7 @@ import sklearn
 def generator(samples, batch_size=32):
     num_samples = len(samples)
     while 1: # Loop forever so the generator never terminates
-        shuffle(samples)
+        samples = shuffle(samples)
         for offset in range(0, num_samples, batch_size):
             batch_samples = samples[offset:offset+batch_size]
 
@@ -36,6 +23,21 @@ def generator(samples, batch_size=32):
             yield shuffle(X_train, y_train)
 
 if __name__ == "__main__":
+
+    import os
+    import csv
+
+    samples = []
+    with open('data/driving_log.csv') as csvfile:
+        reader = csv.reader(csvfile)
+        for line in reader:
+            samples.append(line)
+    print(samples[5])
+
+    from sklearn.model_selection import train_test_split
+    from sklearn.utils import shuffle
+    train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+
     # compile and train the model using the generator function
     train_generator = generator(train_samples, batch_size=32)
     validation_generator = generator(validation_samples, batch_size=32)
