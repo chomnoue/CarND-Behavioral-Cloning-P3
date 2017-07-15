@@ -1,6 +1,12 @@
 import cv2
 import numpy as np
 import sklearn
+import json
+from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten, Lambda, ELU, Cropping2D
+from keras.layers.convolutional import Convolution2D
 
 def generator(samples, batch_size=32):
     num_samples = len(samples)
@@ -34,8 +40,6 @@ if __name__ == "__main__":
             samples.append(line)
     print(samples[5])
 
-    from sklearn.model_selection import train_test_split
-    from sklearn.utils import shuffle
     train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
     # compile and train the model using the generator function
@@ -43,9 +47,6 @@ if __name__ == "__main__":
     validation_generator = generator(validation_samples, batch_size=32)
 
     # model architecture
-    from keras.models import Sequential
-    from keras.layers import Dense, Dropout, Flatten, Lambda, ELU, Cropping2D
-    from keras.layers.convolutional import Convolution2D
     row, col, ch = 160, 320, 3
 
     model = Sequential()
