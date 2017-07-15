@@ -75,5 +75,5 @@ if __name__ == "__main__":
         os.makedirs(save_dir)
 
     model.save_weights(save_dir+"/model.h5", True)
-    with open(save_dir'/model.json', 'w') as outfile:
+    with open(save_dir+'/model.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
