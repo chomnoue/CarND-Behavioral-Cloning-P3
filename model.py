@@ -42,14 +42,13 @@ if __name__ == "__main__":
 
     # model architecture
     from keras.models import Sequential
-    from keras.layers import Dense, Dropout, Flatten, Lambda, ELU
+    from keras.layers import Dense, Dropout, Flatten, Lambda, ELU, Cropping2D
     from keras.layers.convolutional import Convolution2D
-    ch, row, col = 3, 160, 320 
+    row, col, ch = 160, 320, 3
 
     model = Sequential()
-    model.add(Lambda(lambda x: x/127.5 - 1.,
-                input_shape=(ch, row, col),
-                output_shape=(ch, row, col)))
+    model.add(Cropping2D(cropping=((50,20), (0,0)), input_shape=(row, col, ch)))
+    model.add(Lambda(lambda x: x/127.5 - 1.))
     model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
     model.add(ELU())
     model.add(Convolution2D(32, 5, 5, subsample=(2, 2), border_mode="same"))
