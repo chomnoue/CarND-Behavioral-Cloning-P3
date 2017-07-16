@@ -2,54 +2,59 @@ import cv2
 import numpy as np
 import sklearn
 import json
+import os
+import csv
+import sys
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten, Lambda, ELU, Cropping2D
 from keras.layers.convolutional import Convolution2D
 
-def generator(samples, batch_size=32):
+def get_image(batch_sample, idx):
+    name = 'data/IMG/'+batch_sample[idx].split('/')[-1]
+    return cv2.imread(name)
+
+def generator(samples, batch_size=32, correction=0.1):
+    print("Generating data with correction: ", correction)
     num_samples = len(samples)
     while 1: # Loop forever so the generator never terminates
         samples = shuffle(samples)
-        for offset in range(0, num_samples, batch_size):
-            batch_samples = samples[offset:offset+batch_size]
+        images = []
+        angles = []
 
-            images = []
-            angles = []
-            for batch_sample in batch_samples:
-                name = 'data/IMG/'+batch_sample[0].split('/')[-1]
-                center_image = cv2.imread(name)
-                center_angle = float(batch_sample[3])
-                images.append(center_image)
-                angles.append(center_angle)
+        def add_sample(image, angle):
+            #add each image with a flipped version of it
+            image_flipped = np.fliplr(image)
+            angle_flipped = -angle
+            images.extend((image, image_flipped))
+            angles.extend((angle, angle_flipped))
 
-            X_train = np.array(images)
-            y_train = np.array(angles)
-            yield shuffle(X_train, y_train)
+        for idx, batch_sample in enumerate(samples):
+            #use the three cameras             
+            center_image = get_image(batch_sample,0)
+            left_image = get_image(batch_sample,1)
+            right_image = get_image(batch_sample,2)
 
-if __name__ == "__main__":
+            center_angle = float(batch_sample[3])
+            left_angle = center_angle + correction
+            right_angle = center_angle - correction
+            add_sample(center_image, center_angle)
+            add_sample(left_image, left_angle)
+            add_sample(right_image, right_angle)
 
-    import os
-    import csv
+            #yield if we have batch_size images or we reach the end of the epoch
+            if len(images) >= batch_size or idx==num_samples-1:
+                X_train = np.array(images[:batch_size])
+                y_train = np.array(angles[:batch_size])
+                images = images[batch_size:]
+                angles = angles[batch_size:]
+                yield shuffle(X_train, y_train)
 
-    samples = []
-    with open('data/driving_log.csv') as csvfile:
-        reader = csv.reader(csvfile)
-        for line in reader:
-            samples.append(line)
-
-    train_samples, validation_samples = train_test_split(samples, test_size=0.2)
-
-    # compile and train the model using the generator function
-    train_generator = generator(train_samples, batch_size=32)
-    validation_generator = generator(validation_samples, batch_size=32)
-
-    # model architecture
-    row, col, ch = 160, 320, 3
-
+def get_model():
+    print("using default achitecture")
     model = Sequential()
-    model.add(Cropping2D(cropping=((50,20), (0,0)), input_shape=(row, col, ch)))
+    model.add(Cropping2D(cropping=((70,20), (0,0)), input_shape=(row, col, ch)))
     model.add(Lambda(lambda x: x/127.5 - 1.))
     model.add(Convolution2D(16, 8, 8, subsample=(4, 4), border_mode="same"))
     model.add(ELU())
@@ -63,11 +68,57 @@ if __name__ == "__main__":
     model.add(Dropout(.5))
     model.add(ELU())
     model.add(Dense(1))
+    return model
+
+def get_nvdia_model():
+    print("using nvidia achitecture")
+    dropout=0.5
+    model = Sequential()
+    model.add(Cropping2D(cropping=((70,20), (0,0)), input_shape=(row, col, ch)))
+    model.add(Lambda(lambda x: x/127.5 - 1.))
+    model.add(Convolution2D(24, 5, 5, subsample=(2, 2), activation="relu"))
+    model.add(Convolution2D(36, 5, 5, subsample=(2, 2), activation="relu"))
+    model.add(Convolution2D(48, 5, 5, subsample=(2, 2), activation="relu"))
+    model.add(Convolution2D(64, 3, 3, activation="relu"))
+    model.add(Convolution2D(64, 3, 3, activation="relu"))
+    model.add(Flatten())
+    model.add(Dense(100, activation="relu"))
+    model.add(Dropout(dropout))
+    model.add(Dense(50, activation="relu"))
+    model.add(Dropout(dropout))
+    model.add(Dense(10, activation="relu"))
+    model.add(Dropout(dropout))
+    model.add(Dense(1))
+    return model
+
+if __name__ == "__main__":
+    architecture = sys.argv[1]
+    epochs = int(sys.argv[2])
+    correction = float(sys.argv[3])
+    print("architecture:",architecture, ", epochs:", epochs,", correction:", correction)
+
+    samples = []
+    with open('data/driving_log.csv') as csvfile:
+        reader = csv.reader(csvfile)
+        for line in reader:
+            samples.append(line)
+
+    train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+
+    # compile and train the model using the generator function
+    train_generator = generator(train_samples, batch_size=32, correction = correction)
+    validation_generator = generator(validation_samples, batch_size=32, correction = correction)
+
+    # model architecture
+    row, col, ch = 160, 320, 3
+
+    model = get_nvdia_model() if architecture=="nvidia" else get_model()
 
     model.compile(optimizer="adam", loss="mse")
 
-    model.fit_generator(train_generator, samples_per_epoch= len(train_samples),
-                         validation_data=validation_generator, nb_val_samples=len(validation_samples), nb_epoch=3)
+    #for each sample we have three camera images, each flipped. We thus have 3*2=6 images per sample
+    model.fit_generator(train_generator, samples_per_epoch= len(train_samples)*6,
+                         validation_data=validation_generator, nb_val_samples=len(validation_samples)*6, nb_epoch=epochs)
 
     print("Saving model weights and configuration file.")
 
@@ -75,6 +126,8 @@ if __name__ == "__main__":
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
-    model.save(save_dir+"/model.h5", True)
-    with open(save_dir+'/model.json', 'w') as outfile:
+    model_name = "/model_{}_{}_{}".format(architecture, epochs, str(correction).replace(".","_"))
+
+    model.save(save_dir+model_name+".h5", True)
+    with open(save_dir+model_name+'.json', 'w') as outfile:
         json.dump(model.to_json(), outfile)
