@@ -1,6 +1,6 @@
-#**Behavioral Cloning** 
+# **Behavioral Cloning** 
 
-##Writeup
+## Writeup
 
 ---
 
@@ -24,9 +24,9 @@ The goals / steps of this project are the following:
 
 
 ---
-###Files Submitted & Code Quality
+### Files Submitted & Code Quality
 
-####1. Submission includes all required files and can be used to run the simulator in autonomous mode
+#### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
 
 My project includes the following files:
 * model.py containing the script to create and train the model
@@ -35,20 +35,20 @@ My project includes the following files:
 * writeup_report.md summarizing the results
 * video.mp4 showing how the car is self-driving on a lap of the circuit
 
-####2. Submission includes functional code
+#### 2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can be driven autonomously around the track by executing 
 ```sh
 python drive.py model.h5
 ```
 
-####3. Submission code is usable and readable
+#### 3. Submission code is usable and readable
 
 The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works. 
 It takes as parameters the name of the architecture, the number of epochs to run and the correction value to be applied to the angle for the left and right cameras images
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. An appropriate model architecture has been employed
+#### 1. An appropriate model architecture has been employed
 
 I have tried two model architectures: 
 
@@ -61,26 +61,26 @@ The images are cropped to remove the parts zones non-relevant to the driving dec
 
 The nvidia architecture produced better results so I used it for the released model.
 
-####2. Attempts to reduce overfitting in the model
+#### 2. Attempts to reduce overfitting in the model
 
 The model contains dropout layers in order to reduce overfitting (model.py lines 65, 68, 86, 88 and 90). 
 
 The model was trained and validated on different data sets to ensure that the model was not overfitting (code line 106-120). The model was tested by running it through the simulator and ensuring that the vehicle could stay on the track.
 
-####3. Model parameter tuning
+#### 3. Model parameter tuning
 
 The model used an adam optimizer, so the learning rate was not tuned manually (model.py line 177).
 
-####4. Appropriate training data
+#### 4. Appropriate training data
 
 I used a combination of center lane driving, recovering from the left and right sides of the road (model.py lines 35-44). 
 I have tried values .1, .2, .3 ,.4 and .5 values for the *correction*. Value .4 better results in the simulator so I kept it for the final model 
 I also added, for each image, a flipped version of it (code line 28-29)
 
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
-####1. Solution Design Approach
+#### 1. Solution Design Approach
 
 The overall strategy for deriving a model architecture was to look for existing working architectures and try to adapt one of them
 
@@ -96,7 +96,7 @@ The final step was to run the simulator to see how well the car was driving arou
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
-####2. Final Model Architecture
+#### 2. Final Model Architecture
 
 The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
 
