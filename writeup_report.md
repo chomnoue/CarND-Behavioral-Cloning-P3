@@ -21,6 +21,8 @@ The goals / steps of this project are the following:
 [recovering_from_left_side]: ./examples/recovering_from_left_side.jpg "Recovery from left side"
 [recovering_from_right_side]: ./examples/recovering_from_right_side.jpg "Recovery right side"
 [center_lane_driving_flipped]: ./examples/center_lane_driving_flipped.jpg "Center land driving flipped"
+
+
 ---
 ###Files Submitted & Code Quality
 
