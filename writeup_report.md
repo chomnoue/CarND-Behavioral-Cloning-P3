@@ -16,14 +16,11 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/placeholder.png "Model Visualization"
-[image2]: ./examples/placeholder.png "Grayscaling"
-[image3]: ./examples/placeholder_small.png "Recovery Image"
-[image4]: ./examples/placeholder_small.png "Recovery Image"
-[image5]: ./examples/placeholder_small.png "Recovery Image"
-[image6]: ./examples/placeholder_small.png "Normal Image"
-[image7]: ./examples/placeholder_small.png "Flipped Image"
-
+[nvidia_architecture]: ./model.png "Model Architecture"
+[center_lane_driving]: ./examples/center_lane_driving.jpg "Center Lane driving"
+[recovering_from_left_side]: ./examples/recovering_from_left_side.jpg "Recovery from left side"
+[recovering_from_right_side]: ./examples/recovering_from_right_side.jpg "Recovery right side"
+[center_lane_driving_flipped]: ./examples/center_lane_driving_flipped.jpg "Center land driving flipped"
 ---
 ###Files Submitted & Code Quality
 
@@ -101,34 +98,29 @@ At the end of the process, the vehicle is able to drive autonomously around the 
 
 The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
+Here is a visualization of the architecture (note: The parameters of each layers are discribed above)
 
-![alt text][image1]
+![Mocel architecture][nvidia_architecture]
 
 ####3. Creation of the Training Set & Training Process
 
 To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
 
-![alt text][image2]
+![Center land driving][center_lane_driving]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
+I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to avoid crossing the lanes These images show what a recovery looks like :
 
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
+![Recovering from left side][recovering_from_left_side]
+![Recovering from right side][recovering_from_right_side]
 
 Then I repeated this process on track two in order to get more data points.
 
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
+To augment the data set, I also flipped images and angles thinking that this would help the model to generalize. For example, here the above center lane driving image that has then been flipped:
 
-![alt text][image6]
-![alt text][image7]
+![Center lane driving flipped][center_lane_driving_flipped]
 
-Etc ....
+I also used for each image from right and left cameras to he help the car learn to stay away from lanes.
 
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+I finally randomly shuffled the data set and put 20% of the data into a validation set. 
 
-
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
-
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The result was quite good after 20 epochs. I used an adam optimizer so that manually training the learning rate wasn't necessary.
