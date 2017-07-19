@@ -74,7 +74,7 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 #### 4. Appropriate training data
 
 I used a combination of center lane driving, recovering from the left and right sides of the road (model.py lines 35-44). 
-I have tried values .1, .2, .3 ,.4 and .5 values for the *correction*. Value .4 better results in the simulator so I kept it for the final model 
+I have tried values .1, .2, .3 ,.4 and .5 values for the **correction**. Value **.4** has shown better results in the simulator so I kept it for the final model 
 I also added, for each image, a flipped version of it (code line 28-29)
 
 
@@ -92,7 +92,7 @@ To combat the overfitting, I modified the model by adding droput layers.
 
 Then I augmented training data by using the left and right cameras, and adding a flipped version of each image.
 
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track. To improve the driving behavior in these cases, I played with the correction applied to the angle value for left and right cameras images. The value of .4 showed to be the best.
+The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track. To improve the driving behavior in these cases, I played with the correction applied to the angle value for left and right cameras images. The value of **.4** showed to be the best.
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
