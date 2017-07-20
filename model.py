@@ -13,7 +13,9 @@ from keras.layers.convolutional import Convolution2D
 
 def get_image(batch_sample, idx):
     name = 'data/IMG/'+batch_sample[idx].split('/')[-1]
-    return cv2.imread(name)
+    image = cv2.imread(name)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB) # convert to BRG as it is the format use by PIL to read images in driver.py
+    return image
 
 def generator(samples, batch_size=32, correction=0.1):
     print("Generating data with correction: ", correction)
